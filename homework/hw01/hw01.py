@@ -82,7 +82,7 @@ def if_function(condition, true_result, false_result):
         return false_result
 
 
-def with_if_statement():
+def with_if_statement(): #passed
     """
     >>> result = with_if_statement()
     47
@@ -94,7 +94,7 @@ def with_if_statement():
     else:
         return false_func()
 
-def with_if_function():
+def with_if_function(): #passed
     """
     >>> result = with_if_function()
     42
@@ -106,12 +106,15 @@ def with_if_function():
 
 def cond():
     "*** YOUR CODE HERE ***"
+    return False
 
 def true_func():
     "*** YOUR CODE HERE ***"
+    print(42)
 
 def false_func():
     "*** YOUR CODE HERE ***"
+    print(47)
 
 
 def hailstone(n): #passed
