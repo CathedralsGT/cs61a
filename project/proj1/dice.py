@@ -17,13 +17,20 @@ from random import randint
 
 def make_fair_dice(sides):
     """Return a die that returns 1 to SIDES with equal chance."""
-    assert type(sides) == int and sides >= 1, 'Illegal value for sides'
+    # If the number of sides isn't greater than 1, it is illegal!
+    # If it's even not a number, then it's INDEED illegal!
+    assert type(sides) == int and sides >= 1, 'Illegal value for sides'    
     def dice():
+        # Use randint to return random int ranging from 1 to sides.
         return randint(1,sides)
+    # We return this function. (So it's a higher-order function!!!)
     return dice
 
+# Just a four sided dice, as we have seen above.
 four_sided = make_fair_dice(4)
+# Normal six sided dice.
 six_sided = make_fair_dice(6)
+# If we want to go wild, we can even define a dice that has 1000 sides...
 
 def make_test_dice(*outcomes):
     """Return a die that cycles deterministically through OUTCOMES.
