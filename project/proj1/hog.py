@@ -11,7 +11,7 @@ FIRST_101_DIGITS_OF_PI = 3141592653589793238462643383279502884197169399375105820
 ######################
 
 
-def roll_dice(num_rolls, dice=six_sided):
+def roll_dice(num_rolls, dice=six_sided):    # passed
     """Simulate rolling the DICE exactly NUM_ROLLS > 0 times. Return the sum of
     the outcomes unless any of the outcomes is 1. In that case, return 1.
 
@@ -39,10 +39,15 @@ def roll_dice(num_rolls, dice=six_sided):
     # END PROBLEM 1
 
 
-def free_bacon(score):
+def free_bacon(score):    # passed
     """Return the points scored from rolling 0 dice (Free Bacon).
 
     score:  The opponent's current score.
+    >>> free_bacon(0)
+    6
+
+    >>> free_bacon(1)
+    4
     """
     assert score < 100, 'The game should be over.'
     pi = FIRST_101_DIGITS_OF_PI
@@ -50,12 +55,14 @@ def free_bacon(score):
     # Trim pi to only (score + 1) digit(s)
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    while pi > 10**(score+1):
+        pi = pi // 10
     # END PROBLEM 2
 
     return pi % 10 + 3
 
 
-def take_turn(num_rolls, opponent_score, dice=six_sided):
+def take_turn(num_rolls, opponent_score, dice=six_sided):    # passed
     """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
     Return the points scored for the turn by the current player.
 
@@ -70,6 +77,11 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if num_rolls == 0:
+        result = free_bacon(opponent_score)
+    else:
+        result = roll_dice(num_rolls, dice)
+    return result
     # END PROBLEM 3
 
 
@@ -79,7 +91,24 @@ def extra_turn(player_score, opponent_score):
             swine_align(player_score, opponent_score))
 
 
-def swine_align(player_score, opponent_score):
+def gcd(num1, num2):    # passed
+    '''Return the GCD of the given two positive integers.
+    
+    >>> gcd(15,10)
+    5
+    >>> gcd(26, 8)
+    2
+    '''
+    assert num1 > 0 and num2 > 0, "You should input two integers that are strictly greater than 0!"
+
+    if num1 % num2 != 0:
+        return gcd(num2, num1%num2)
+    else:
+        return num2
+
+
+
+def swine_align(player_score, opponent_score):    # passed
     """Return whether the player gets an extra turn due to Swine Align.
 
     player_score:   The total score of the current player.
@@ -92,10 +121,16 @@ def swine_align(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4a
     "*** YOUR CODE HERE ***"
+    if player_score == 0 or opponent_score == 0:
+        return False
+    elif gcd(player_score, opponent_score) >= 10:
+        return True
+    else:
+        return False
     # END PROBLEM 4a
 
 
-def pig_pass(player_score, opponent_score):
+def pig_pass(player_score, opponent_score):    # passsed
     """Return whether the player gets an extra turn due to Pig Pass.
 
     player_score:   The total score of the current player.
@@ -114,6 +149,10 @@ def pig_pass(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4b
     "*** YOUR CODE HERE ***"
+    if player_score < opponent_score and opponent_score - player_score < 3:
+        return True
+    else:
+        return False
     # END PROBLEM 4b
 
 
@@ -134,7 +173,7 @@ def silence(score0, score1):
 
 
 def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
-         goal=GOAL_SCORE, say=silence):
+         goal=GOAL_SCORE, say=silence):    
     """Simulate a game and return the final scores of both players, with Player
     0's score first, and Player 1's score second.
 
@@ -151,8 +190,29 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     say:        The commentary function to call at the end of the first turn.
     """
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
-    # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    # BEGIN PROBLEM 5     
+    "*** YOUR CODE HERE ***"    # PASSED!!!
+    while score0 < goal and score1 < goal: # If one of the score is no less than the goal score, the game should be aborted.
+        if who == 0:
+            # Roll the dice for the first time, and add the score to the total score.
+            score0 += take_turn(strategy0(score0, score1), score1, dice)
+            # Check if the score is greater than goal(!!!):
+            if score0 >= goal: break
+            # Check if there's a chance for extra turn.
+            while extra_turn(score0, score1):
+                score0 += take_turn(strategy0(score0, score1), score1, dice)
+                if score0 >= goal: break
+            # Switch to your opponent.
+            who = other(who)
+        else:
+            # The same as above, remember the opponent_score is now score0
+            score1 += take_turn(strategy1(score1, score0), score0, dice)
+            if score1 >= goal: break
+            while extra_turn(score1, score0):
+                score1 += take_turn(strategy1(score1, score0), score0, dice)
+                if score1 >= goal: break
+            who = other(who)
+
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
