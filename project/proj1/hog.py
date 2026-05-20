@@ -173,7 +173,7 @@ def silence(score0, score1):
 
 
 def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
-         goal=GOAL_SCORE, say=silence):    
+         goal=GOAL_SCORE, say=silence):    # passed
     """Simulate a game and return the final scores of both players, with Player
     0's score first, and Player 1's score second.
 
@@ -196,35 +196,41 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
         if who == 0:
             # Roll the dice for the first time, and add the score to the total score.
             score0 += take_turn(strategy0(score0, score1), score1, dice)
+            say = say(score0, score1)
             # Check if the score is greater than goal(!!!):
             if score0 >= goal: break
             # Check if there's a chance for extra turn.
             while extra_turn(score0, score1):
                 score0 += take_turn(strategy0(score0, score1), score1, dice)
+                say = say(score0, score1)
                 if score0 >= goal: break
             # Switch to your opponent.
             who = other(who)
         else:
             # The same as above, remember the opponent_score is now score0
             score1 += take_turn(strategy1(score1, score0), score0, dice)
+            say = say(score0, score1)
             if score1 >= goal: break
             while extra_turn(score1, score0):
                 score1 += take_turn(strategy1(score1, score0), score0, dice)
+                say = say(score0, score1)
                 if score1 >= goal: break
             who = other(who)
 
     # END PROBLEM 5
-    # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
-    # BEGIN PROBLEM 6
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 6
+        # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
+        # BEGIN PROBLEM 6
+        "*** YOUR CODE HERE ***"
+        # Well, given the doctests(which can be viewed via 'python ok -q 06 -u --local'), 
+        # the code solving problem 6 should be integrated into the above while loop(lines with 'say = say(s0, s1)')
+        # END PROBLEM 6
     return score0, score1
 
 
 #######################
 # Phase 2: Commentary #
 #######################
-
+### HARD PART IS COMMING !!!...... ###
 
 def say_scores(score0, score1):
     """A commentary function that announces the score for each player."""
@@ -235,7 +241,7 @@ def say_scores(score0, score1):
 def announce_lead_changes(last_leader=None):
     """Return a commentary function that announces lead changes.
 
-    >>> f0 = announce_lead_changes()
+    >>> f0 = announce_lead_changes()    
     >>> f1 = f0(5, 0)
     Player 0 takes the lead by 5
     >>> f2 = f1(5, 12)
@@ -245,6 +251,14 @@ def announce_lead_changes(last_leader=None):
     >>> f5 = f4(15, 13)
     Player 0 takes the lead by 2
     """
+    # Annotation of the doctest above:
+    # 'announce_lead_changes' is the function name, if you write a_l_c(), then the func would be called!
+    # Due to the definition of 'a_l_c', we would get a function 'say' in return! (With possible bypass)
+    # So f0 is a function 'say' now!
+    # f1 = f0(5, 0): func 'say' takes in two ints and output **a_l_c(leader)**, NOT the func 'a_l_c'!!!
+    # So a_l_c(leader) is called before the output, which is again a 'say' function, with possible bypass
+    # Therefore, f1 is still a 'say' function, and the follow code act just the same.
+    # So we are actually passing the 'say' func, a_l_c is used to pass the variable 'last_leader'.
     def say(score0, score1):
         if score0 > score1:
             leader = 0
@@ -254,8 +268,28 @@ def announce_lead_changes(last_leader=None):
             leader = None
         if leader != None and leader != last_leader:
             print('Player', leader, 'takes the lead by', abs(score0 - score1))
-        return announce_lead_changes(leader)
-    return say
+        return announce_lead_changes(leader)    
+        # Note: the return value of 'say' is not a 'a_l_c' func, but the output of a_l_c(leader), 
+        # which is again a 'say' func!!!
+    return say    # Return value is a function.
+# ========================================================================================
+# 架构设计思考：为什么解说员函数（Commentary）要设计成“高阶函数 + 闭包”的结构？
+# ========================================================================================
+# 1. 职责分离 (Separation of Concerns)：
+#    将核心游戏逻辑（掷骰、算分）与表现层（打印解说）彻底解耦，互不干扰。
+#
+# 2. 替代方案（显式状态传递）的局限：
+#    如果设计为：`announce(last_leader, score0, score1) -> current_leader`
+#    - 缺点：`play` 函数的循环体内必须被迫声明并维护 `last_leader` 变量。
+#    - 耦合：一旦更换成关注“单回合最高分”的解说员，`play` 内部的代码和状态就必须重写。
+#
+# 3. 官方方案（闭包 Closure）的决定性优势：
+#    通过返回一个“捕获了当前状态”的新函数，实现了：
+#    - 【完美封装】：状态（如 `last_leader`）被隐藏在解说函数的闭包内部，`play` 既不知道也不关心。
+#    - 【多态与统一接口】：所有解说员无论内部逻辑多复杂，对外的接口永远保持一致：
+#      `commentary = commentary(score0, score1)`
+#      这使得 `play` 函数具有极强的通用性，换任何解说员都不需要修改 `play` 的一行代码。
+# ========================================================================================
 
 
 def both(f, g):
