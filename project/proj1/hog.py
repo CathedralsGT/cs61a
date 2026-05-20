@@ -313,7 +313,7 @@ def both(f, g):
     return say
 
 
-def announce_highest(who, last_score=0, running_high=0):
+def announce_highest(who, last_score=0, running_high=0):    # passed
     """Return a commentary function that announces when WHO's score
     increases by more than ever before in the game.
 
@@ -335,6 +335,23 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def say(score0, score1):
+        if who == 0:
+            gain = score0 - last_score
+            if gain > running_high:
+                print(gain, 'point(s)! The most yet for Player', who)
+                return announce_highest(who, score0, gain)
+            else:
+                return announce_highest(who, score0, running_high)
+        if who == 1:
+            gain = score1 - last_score
+            if gain > running_high:
+                print(gain, 'point(s)! The most yet for Player', who)
+                return announce_highest(who, score1, gain)
+            else:
+                return announce_highest(who, score1, running_high)
+        
+    return say
     # END PROBLEM 7
 
 
@@ -361,7 +378,7 @@ def always_roll(n):
     return strategy
 
 
-def make_averaged(original_function, trials_count=1000):
+def make_averaged(original_function, trials_count=1000):    # passed
     """Return a function that returns the average value of ORIGINAL_FUNCTION
     when called.
 
@@ -375,10 +392,18 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def function(*args):
+        num_trials = 0
+        result = 0
+        while num_trials < trials_count:
+            result += original_function(*args)
+            num_trials += 1
+        return result / trials_count
+    return function
     # END PROBLEM 8
 
 
-def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
+def max_scoring_num_rolls(dice=six_sided, trials_count=1000):    # passed
     """Return the number of dice (1 to 10) that gives the highest average turn
     score by calling roll_dice with the provided DICE over TRIALS_COUNT times.
     Assume that the dice always return positive outcomes.
@@ -389,6 +414,18 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    result, optimal_result, max_score = 1, 1, 0
+
+    while result <= 10:
+        averaged_roll_of_n_times = make_averaged(roll_dice, trials_count)    # remember to pass a func rather than the output of a func!!!
+        score = averaged_roll_of_n_times(result, dice)
+        if score > max_score:
+            optimal_result = result
+            max_score = score
+        result += 1
+
+    return optimal_result
+
     # END PROBLEM 9
 
 
@@ -417,14 +454,20 @@ def run_experiments():
         six_sided_max = max_scoring_num_rolls(six_sided)
         print('Max scoring num rolls for six-sided dice:', six_sided_max)
 
-    if False:  # Change to True to test always_roll(8)
-        print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
+    if True:  # Change to True to test always_roll(n)
+        n = 1
+        while n <= 10:
+            print('always_roll(', n, ') win rate against a_r(6):', average_win_rate(always_roll(n)))
+            n += 1
 
-    if False:  # Change to True to test bacon_strategy
+    if True:  # Change to True to test bacon_strategy
         print('bacon_strategy win rate:', average_win_rate(bacon_strategy))
 
-    if False:  # Change to True to test extra_turn_strategy
+    if True:  # Change to True to test extra_turn_strategy
         print('extra_turn_strategy win rate:', average_win_rate(extra_turn_strategy))
+
+    if True: # Compart bacon strategy with extra-turn strategy
+        print('win rate of bacon over extra-turn:', average_win_rate(bacon_strategy, extra_turn_strategy))
 
     if False:  # Change to True to test final_strategy
         print('final_strategy win rate:', average_win_rate(final_strategy))
@@ -433,22 +476,35 @@ def run_experiments():
 
 
 
-def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
+def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):    # passed (variable 'score' not used ??)
     """This strategy rolls 0 dice if that gives at least CUTOFF points, and
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    bacon_score = free_bacon(opponent_score)
+    if bacon_score >= cutoff:
+        return 0
+    else:
+        return num_rolls
+    # return 6  # Replace this statement
     # END PROBLEM 10
 
 
-def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
+def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):    # passed
     """This strategy rolls 0 dice when it triggers an extra turn. It also
     rolls 0 dice if it gives at least CUTOFF points and does not give an extra turn.
     Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    if bacon_strategy(score, opponent_score, cutoff, num_rolls) == 0:
+        return 0
+    elif swine_align(score+free_bacon(opponent_score), opponent_score):
+        return 0
+    elif pig_pass(score+free_bacon(opponent_score), opponent_score):
+        return 0
+    else:
+        return num_rolls
+    # return 6  # Replace this statement
     # END PROBLEM 11
 
 
