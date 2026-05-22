@@ -1,5 +1,5 @@
 
-def lambda_curry2(func):
+def lambda_curry2(func):    # passed
     """
     Returns a Curried version of a two-argument function FUNC.
     >>> from operator import add, mul, mod
@@ -15,11 +15,15 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    def g(x):
+        def h(y):
+            return func(x, y)
+        return h  
+    return g
 
 
 
-def count_cond(condition):
+def count_cond(condition):    #passed
     """Returns a function with one parameter N that counts all the numbers from
     1 to N that satisfy the two-argument predicate function Condition, where
     the first argument for Condition is N and the second argument is the
@@ -47,6 +51,13 @@ def count_cond(condition):
     8
     """
     "*** YOUR CODE HERE ***"
+    def count(N):
+        total, i = 0, 1
+        while i <= N:
+            if condition(N, i): total += 1
+            i += 1
+        return total
+    return count
 
 
 
@@ -82,10 +93,13 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
+    def validation(x):
+        return compose1(f, g)(x) == compose1(g, f)(x)
+    return validation
 
 
 
-def cycle(f1, f2, f3):
+def cycle(f1, f2, f3):    # passed
     """Returns a function that is itself a higher-order function.
 
     >>> def add1(x):
@@ -112,4 +126,20 @@ def cycle(f1, f2, f3):
     19
     """
     "*** YOUR CODE HERE ***"
+    def crazy_func(n):
+        def func(m):
+            i = 1
+            result = m
+            while i <= n:
+                if i % 3 == 1:
+                    result = f1(result)
+                elif i % 3 == 2:
+                    result = f2(result)
+                else:
+                    result = f3(result)
+                i += 1
+            return result
+        return func
+    return crazy_func
+
 
