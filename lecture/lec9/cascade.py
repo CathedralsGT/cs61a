@@ -80,13 +80,16 @@ def count_partitions(num, biggest):
     9
     >>> count_partitions(2, 2)
     2
+    >>> count_partitions(3, 4)
+    3
     """
     assert type(num) == int, "You should enter an integer."
     assert num > 0, "The integer should be strictly positive."
+
     if num == 1 or biggest == 1:
         return 1
-    else:
-        if num - biggest > 0:
+    
+    if num - biggest > 0:
             return count_partitions(num, biggest-1) + count_partitions(num-biggest, biggest)
-        else:
-            return count_partitions(num, num-1) + 1 
+    
+    return count_partitions(num, min(num, biggest-1)) + int(num - biggest == 0)    # !!
