@@ -31,26 +31,30 @@ def num_eights(x):    # passed
         return int(x%10 == 8) + num_eights(x//10)
 
 
-def num_knots(n):    # The helper function for pingpong(n)
-    """Calculate the number of knots exactly before n.
+# def num_knots(n):    # The helper function for pingpong(n)
+#     """Calculate the number of knots exactly before n.
     
-    >>> num_knots(8)
-    0
-    >>> num_knots(15)
-    1
-    >>> num_knots(16)
-    1
-    >>> num_knots(17)
-    2
-    >>> num_knots(18)
-    2
-    >>> num_knots(19)
-    3
-    """
-    if n-1 < 8:
-        return 0
-    else:
-        return int((n-1)%8==0 or num_eights(n-1)) + num_knots(n-1)
+#     >>> num_knots(8)
+#     0
+#     >>> num_knots(15)
+#     1
+#     >>> num_knots(16)
+#     1
+#     >>> num_knots(17)
+#     2
+#     >>> num_knots(18)
+#     2
+#     >>> num_knots(19)
+#     3
+#     """
+#     if n-1 < 8:
+#         return 0
+#     else:
+#         return int((n-1)%8==0 or num_eights(n-1)) + num_knots(n-1)
+# WARNING：Using this kind of implementation would reach a time complexity of O(n^2), which is not the most elegant way!
+
+def pingpong_cond(k):    # Check whether number k is the knot in the pingpong sequence.
+    return (k % 8 == 0 or num_eights(k) != 0)
     
 
 def pingpong(n):    # passed
@@ -86,13 +90,26 @@ def pingpong(n):    # passed
     True
     """
     "*** YOUR CODE HERE ***"
-    if n <= 8: 
-        return n
-    else:
-        if num_knots(n) % 2 == 0:
-            return pingpong(n-1) + 1
+    # if n <= 8: 
+    #     return n
+    # else:
+    #     if num_knots(n) % 2 == 0:
+    #         return pingpong(n-1) + 1
+    #     else:
+    #         return pingpong(n-1) - 1
+    assert n>=1, "You should input a strictly positive integer!"
+    def pingpong_helper(ppn=1, index=1, sgn=1):
+        if index < n:
+            if pingpong_cond(index):    # num "index" is a knot
+                return pingpong_helper(ppn-sgn, index+1, -sgn)
+            else:
+                return pingpong_helper(ppn+sgn, index+1, sgn)
         else:
-            return pingpong(n-1) - 1
+            return ppn
+    return pingpong_helper()
+
+
+
 
 
 
