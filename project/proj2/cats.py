@@ -10,17 +10,23 @@ from datetime import datetime
 ###########
 
 
-def choose(paragraphs, select, k):
+def choose(paragraphs, select, k): # passed
     """Return the Kth paragraph from PARAGRAPHS for which SELECT called on the
     paragraph returns true. If there are fewer than K such paragraphs, return
     the empty string.
     """
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    selected_paragraphs = [p for p in paragraphs if select(p) == True]
+    if len(selected_paragraphs) < k+1:
+        return ''
+    else:
+        return selected_paragraphs[k]
+
     # END PROBLEM 1
 
 
-def about(topic):
+def about(topic): # passed
     """Return a select function that returns whether a paragraph contains one
     of the words in TOPIC.
 
@@ -33,10 +39,17 @@ def about(topic):
     assert all([lower(x) == x for x in topic]), 'topics should be lowercase.'
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    def select_func(str):
+        processed_str = split(remove_punctuation(lower(str)))
+        for t in topic:
+            if any([s for s in processed_str if s == t]):
+                return True
+        return False
+    return select_func
     # END PROBLEM 2
 
 
-def accuracy(typed, reference):
+def accuracy(typed, reference): # passed
     """Return the accuracy (percentage of words typed correctly) of TYPED
     when compared to the prefix of REFERENCE that was typed.
 
@@ -57,14 +70,19 @@ def accuracy(typed, reference):
     reference_words = split(reference)
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if not typed:
+        return 0.0
+    check = [typed_words[i] for i in range(min(len(typed_words), len(reference_words))) if typed_words[i]==reference_words[i]]
+    return len(check)/len(typed_words) * 100.0
     # END PROBLEM 3
 
 
-def wpm(typed, elapsed):
+def wpm(typed, elapsed): # passed
     """Return the words-per-minute (WPM) of the TYPED string."""
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    return (len(typed)/5.0) * (60.0/elapsed)
     # END PROBLEM 4
 
 
