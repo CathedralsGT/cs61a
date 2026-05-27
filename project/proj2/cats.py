@@ -86,47 +86,88 @@ def wpm(typed, elapsed): # passed
     # END PROBLEM 4
 
 
-def autocorrect(user_word, valid_words, diff_function, limit):
+def autocorrect(user_word, valid_words, diff_function, limit): # passed
     """Returns the element of VALID_WORDS that has the smallest difference
     from USER_WORD. Instead returns USER_WORD if that difference is greater
     than LIMIT.
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    if user_word in valid_words:
+        return user_word
+    
+    diff_rate = [diff_function(user_word, valid_word, limit) for valid_word in valid_words]
+    # if min(diff_rate) > limit:
+    #     return user_word
+    min_diff_rate = diff_rate[0]
+    index = 0
+
+    for i in range(1, len(valid_words)):
+        if diff_rate[i] < min_diff_rate:
+            min_diff_rate = diff_rate[i]
+            index = i
+
+    if min_diff_rate > limit:
+        return user_word
+    else:
+        return valid_words[index]
     # END PROBLEM 5
 
 
-def shifty_shifts(start, goal, limit):
+def shifty_shifts(start, goal, limit): # passed
     """A diff function for autocorrect that determines how many letters
     in START need to be substituted to create GOAL, then adds the difference in
     their lengths.
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    def calculate_diff(start, goal, num_of_change=0):
+        if num_of_change > limit:
+            return num_of_change
+        if not start:
+            return len(goal) + num_of_change
+        if not goal:
+            return len(start) + num_of_change
+        if start[0] == goal[0]:
+            return calculate_diff(start[1:], goal[1:], num_of_change)
+        else:
+            return calculate_diff(start[1:], goal[1:], num_of_change+1)
+    return calculate_diff(start, goal)
     # END PROBLEM 6
 
 
 def pawssible_patches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
+    # assert False, "Remove this line for this diff function to be used."
 
-    if ______________: # Fill in the condition
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    # if True: # Fill in the condition
+    #     # BEGIN
+    #     "*** YOUR CODE HERE ***"
+    #     # END
 
-    elif ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    # elif True: # Feel free to remove or add additional cases
+    #     # BEGIN
+    #     "*** YOUR CODE HERE ***"
+    #     # END
 
-    else:
-        add_diff = ... # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    # else:
+    #     add_diff = ... # Fill in these lines
+    #     remove_diff = ...
+    #     substitute_diff = ...
+    #     # BEGIN
+    #     "*** YOUR CODE HERE ***"
+    #     # END
+    def calculate_patches(start, goal, num_of_change=0):
+        if num_of_change > limit:
+            return num_of_change
+        if not start: # add len(goal) times
+            return len(goal) + num_of_change
+        if not goal: # delete len(start) times
+            return len(start) + num_of_change
+        if start[0] == goal[0]:
+            return 0 # to be done
+        # to be done
+        
+    return calculate_patches(start, goal)
 
 
 def final_diff(start, goal, limit):
