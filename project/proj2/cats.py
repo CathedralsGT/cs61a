@@ -119,6 +119,7 @@ def shifty_shifts(start, goal, limit): # passed
     in START need to be substituted to create GOAL, then adds the difference in
     their lengths.
     """
+    assert False, "Remove this line for this diff function to be used."
     # BEGIN PROBLEM 6
     def calculate_diff(start, goal, num_of_change=0):
         if num_of_change > limit:
@@ -174,10 +175,19 @@ def final_diff(start, goal, limit):
 ###########
 
 
-def report_progress(typed, prompt, user_id, send):
+def report_progress(typed, prompt, user_id, send): # passed
     """Send a report of your id and progress so far to the multiplayer server."""
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    i = 0
+    while i < min(len(typed),len(prompt)):
+        if typed[i] != prompt[i]:
+            break
+        i += 1
+    progress = i / len(prompt)
+    dict = {'id': user_id, 'progress': progress}
+    send(dict)
+    return progress
     # END PROBLEM 8
 
 
@@ -192,7 +202,7 @@ def fastest_words_report(times_per_player, words):
     return report
 
 
-def time_per_word(times_per_player, words):
+def time_per_word(times_per_player, words): # passed
     """Given timing data, return a game data abstraction, which contains a list
     of words and the amount of time each player took to type each word.
 
@@ -204,10 +214,20 @@ def time_per_word(times_per_player, words):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    # times = []
+    # for player in times_per_player:
+    #     player_times = []
+    #     i = 1
+    #     while i < len(player):
+    #         player_times += [player[i] - player[i-1]]
+    #         i += 1
+    #     times += [player_times]
+    times = [ [t_curr - t_prev for t_prev, t_curr in zip(player[:-1], player[1:])] for player in times_per_player] # pythonic!!!
+    return game(words, times)
     # END PROBLEM 9
 
 
-def fastest_words(game):
+def fastest_words(game): # passed
     """Return a list of lists of which words each player typed fastest.
 
     Arguments:
@@ -219,6 +239,20 @@ def fastest_words(game):
     word_indices = range(len(all_words(game)))    # contains an *index* for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
+    words = all_words(game)
+    times = all_times(game)
+    fast_word = [[] for player_index in player_indices]
+    # for word_index in word_indices:
+    #     word_times = [times[player_index][word_index] for player_index in player_indices]
+    #     min_time = min(word_times)
+    #     min_index = word_times.index(min_time)
+    #     fast_word[min_index].append(words[word_index])
+
+    # A much better way to implement!!! (note: enumerate, key=<list>.__get__item, append(), zip(*<list<list>>) )
+    for word_index, word_time in enumerate(zip(*times)):
+        fast_player_index = min(player_indices, key=word_time.__getitem__)
+        fast_word[fast_player_index].append(words[word_index])
+    return fast_word
     # END PROBLEM 10
 
 
