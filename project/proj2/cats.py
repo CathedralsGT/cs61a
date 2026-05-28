@@ -135,37 +135,31 @@ def shifty_shifts(start, goal, limit): # passed
     # END PROBLEM 6
 
 
-def pawssible_patches(start, goal, limit):
+def pawssible_patches(start, goal, limit): # passed
     """A diff function that computes the edit distance from START to GOAL."""
     # assert False, "Remove this line for this diff function to be used."
-
-    # if True: # Fill in the condition
-    #     # BEGIN
-    #     "*** YOUR CODE HERE ***"
-    #     # END
-
-    # elif True: # Feel free to remove or add additional cases
-    #     # BEGIN
-    #     "*** YOUR CODE HERE ***"
-    #     # END
-
-    # else:
-    #     add_diff = ... # Fill in these lines
-    #     remove_diff = ...
-    #     substitute_diff = ...
-    #     # BEGIN
-    #     "*** YOUR CODE HERE ***"
-    #     # END
     def calculate_patches(start, goal, num_of_change=0):
         if num_of_change > limit:
             return num_of_change
-        if not start: # add len(goal) times
-            return len(goal) + num_of_change
-        if not goal: # delete len(start) times
-            return len(start) + num_of_change
+        if not start or not goal: # add len(goal) times or delete len(start) times
+            return max(len(goal), len(start)) + num_of_change
+        
         if start[0] == goal[0]:
-            return 0 # to be done
-        # to be done
+            return calculate_patches(start[1:], goal[1:], num_of_change)
+        else:
+            add_diff = add(start, goal, num_of_change)
+            remove_diff = remove(start, goal, num_of_change)
+            substitute_diff = substitute(start, goal, num_of_change)
+            return min(add_diff, remove_diff, substitute_diff)
+
+    def add(start, goal, num_of_change): # add the first char of str goal to the front of str start, with pruning
+        return calculate_patches(start, goal[1:], num_of_change+1) # goal[0]+start, goal -> start, goal[1:]
+    
+    def remove(start, goal, num_of_change): # remove the first char of str start
+        return calculate_patches(start[1:], goal, num_of_change+1)
+    
+    def substitute(start, goal, num_of_change): # change the first char of str start to the first element of str goal, with pruning
+        return calculate_patches(start[1:], goal[1:], num_of_change+1) # goal[0]+start[1:], goal -> start[1:], goal[1:]
         
     return calculate_patches(start, goal)
 
