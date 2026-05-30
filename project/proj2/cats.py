@@ -99,18 +99,24 @@ def autocorrect(user_word, valid_words, diff_function, limit): # passed
     diff_rate = [diff_function(user_word, valid_word, limit) for valid_word in valid_words]
     # if min(diff_rate) > limit:
     #     return user_word
-    min_diff_rate = diff_rate[0]
-    index = 0
+    # min_diff_rate = diff_rate[0]
+    # index = 0
 
-    for i in range(1, len(valid_words)):
-        if diff_rate[i] < min_diff_rate:
-            min_diff_rate = diff_rate[i]
-            index = i
+    # for i in range(1, len(valid_words)):
+    #     if diff_rate[i] < min_diff_rate:
+    #         min_diff_rate = diff_rate[i]
+    #         index = i
 
-    if min_diff_rate > limit:
+    # if min_diff_rate > limit:
+    #     return user_word
+    # else:
+    #     return valid_words[index]
+    
+    if min(diff_rate) > limit:
         return user_word
     else:
-        return valid_words[index]
+        return valid_words[min(range(len(diff_rate)), key=diff_rate.__getitem__)]
+    
     # END PROBLEM 5
 
 
@@ -119,7 +125,7 @@ def shifty_shifts(start, goal, limit): # passed
     in START need to be substituted to create GOAL, then adds the difference in
     their lengths.
     """
-    assert False, "Remove this line for this diff function to be used."
+    # assert False, "Remove this line for this diff function to be used."
     # BEGIN PROBLEM 6
     def calculate_diff(start, goal, num_of_change=0):
         if num_of_change > limit:
@@ -185,6 +191,7 @@ def report_progress(typed, prompt, user_id, send): # passed
             break
         i += 1
     progress = i / len(prompt)
+
     dict = {'id': user_id, 'progress': progress}
     send(dict)
     return progress
@@ -241,7 +248,7 @@ def fastest_words(game): # passed
     "*** YOUR CODE HERE ***"
     words = all_words(game)
     times = all_times(game)
-    fast_word = [[] for player_index in player_indices]
+    fast_word = [[] for _ in player_indices]
     # for word_index in word_indices:
     #     word_times = [times[player_index][word_index] for player_index in player_indices]
     #     min_time = min(word_times)
@@ -249,9 +256,15 @@ def fastest_words(game): # passed
     #     fast_word[min_index].append(words[word_index])
 
     # A much better way to implement!!! (note: enumerate, key=<list>.__get__item, append(), zip(*<list<list>>) )
-    for word_index, word_time in enumerate(zip(*times)):
-        fast_player_index = min(player_indices, key=word_time.__getitem__)
-        fast_word[fast_player_index].append(words[word_index])
+    # for word_index, word_time in enumerate(zip(*times)):
+    #     fast_player_index = min(player_indices, key=word_time.__getitem__)
+    #     fast_word[fast_player_index].append(word_at(game, word_index))
+
+    # Remember to build the abstract barrier!!!
+    for word_index in word_indices:
+        word_time = [time(game, player_index, word_index) for player_index in player_indices]
+        best_player_index = min(player_indices, key=word_time.__getitem__)
+        fast_word[best_player_index].append(word_at(game, word_index))
     return fast_word
     # END PROBLEM 10
 
